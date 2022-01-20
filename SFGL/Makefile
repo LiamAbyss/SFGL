@@ -34,7 +34,6 @@ OBJS 			= $(patsubst %.cpp,%.o,$(filter %.cpp, $(SRCS)))
 .DEFAULT: all
 .PHONY: all
 all: $(SRCS) $(BUILDDIR) $(OBJS)
-	$(CXX) -c $(CXXFLAGS) $(LIBS) $(SRCS) $(LDFLAGS)
 	$(CXX) $(CXXFLAGS) $(LIBS) $(OBJS) $(LIB_SFGUI_PATH) $(LDFLAGS) $(SFML_LDFLAGS) -o $(BUILDDIR)/$(BUILDNAME)
 
 .PHONY: clean
@@ -42,6 +41,10 @@ clean:
 	rm -rf $(BUILDDIR)
 	rm -rf $(SRCDIR)/*.gch $(SRCDIR)/**/*.gch
 	rm -rf $(SRCDIR)/*.o $(SRCDIR)/**/*.o
+
+.PHONY: format
+format:
+	clang-format $(SRCS) -i --verbose
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
