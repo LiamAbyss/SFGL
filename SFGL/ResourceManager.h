@@ -5,7 +5,11 @@
 #include <SFML/Audio.hpp>
 #include <string>
 #include <iostream>
+#if defined (SFML_SYSTEM_WINDOWS)
 #include <Windows.h>
+#elif defined (SFML_SYSTEM_LINUX)
+#include <sys/stat.h>
+#endif
 #include <fstream>
 #include "libs/json.hpp"
 

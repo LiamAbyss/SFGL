@@ -2,6 +2,7 @@
 
 std::string getMimeType(const std::string& extension)
 {
+#if defined (SFML_SYSTEM_WINDOWS)
     // return mime type based on extension
     HKEY hKey = nullptr;
 	std::string result = "application/unknown";
@@ -29,10 +30,35 @@ std::string getMimeType(const std::string& extension)
 
 	// return result
 	return result;
+#elif defined (SFML_SYSTEM_LINUX)
+	// return mime type based on extension
+	std::string result = "application/unknown";
+	std::string mimeType = "";
+	std::string mimeTypesPath = "/etc/mime.types";
+	std::ifstream mimeTypesFile(mimeTypesPath);
+
+	if (mimeTypesFile.is_open())
+	{
+		while (mimeTypesFile.good())
+		{
+			std::getline(mimeTypesFile, mimeType);
+			if (mimeType.find(extension) != std::string::npos)
+			{
+				result = mimeType.substr(mimeType.find(" ") + 1);
+				break;
+			}
+		}
+
+		mimeTypesFile.close();
+	}
+
+	return result;
+#endif
 }
 
 long long getFileSize(const std::string& filePath)
 {
+	// return size of file in bytes
 	struct stat stat_buf;
 	int rc = stat(filePath.c_str(), &stat_buf);
 	return rc == 0 ? stat_buf.st_size : -1;

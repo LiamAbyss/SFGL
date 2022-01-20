@@ -128,12 +128,18 @@ void Game::stop()
 
 bool Game::setWindowShape(const sf::Image& image) const
 {
+    #if defined (SFML_SYSTEM_WINDOWS)
 	return ::setWShape(window.getSystemHandle(), image);
+    #endif
+    return false;
 }
 
 bool Game::setWindowTransparency(unsigned char alpha) const
 {
+    #if defined (SFML_SYSTEM_WINDOWS)
 	return ::setWTransparency(window.getSystemHandle(), alpha);
+    #endif
+    return false;
 }
 
 Camera& Game::getCamera()

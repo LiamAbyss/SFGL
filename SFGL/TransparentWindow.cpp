@@ -77,7 +77,7 @@ bool setWTransparency(Window wnd, unsigned char alpha)
 	Display* display = XOpenDisplay(NULL);
 	unsigned long opacity = (0xffffffff / 0xff) * alpha;
 	Atom property = XInternAtom(display, "_NET_WM_WINDOW_OPACITY", false);
-	if (property != None)
+	if (property != 0L)
 	{
 		XChangeProperty(display, wnd, property, XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&opacity, 1);
 		XFlush(display);

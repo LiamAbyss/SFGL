@@ -9,7 +9,9 @@
 #include <cstdlib>
 #include <functional>
 #include "ResourceManager.h"
+#if defined (SFML_SYSTEM_WINDOWS)
 #include "TransparentWindow.h"
+#endif
 #include "Camera.h"
 #include "Scene.h"
 
