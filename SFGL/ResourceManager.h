@@ -4,10 +4,10 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <string>
-#include "JsonHeader/json.hpp"
 #include <iostream>
 #include <Windows.h>
 #include <fstream>
+#include "libs/json.hpp"
 
 using GTexture = std::shared_ptr<sf::Texture>;
 using GMusic = std::shared_ptr<sf::Music>;
