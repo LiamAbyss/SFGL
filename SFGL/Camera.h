@@ -5,9 +5,8 @@
 #include <cmath>
 #include <iostream>
 
-class Camera : public sf::View
-{
-private:
+class Camera : public sf::View {
+  private:
     /**
      * \private
      * Duration of the camera's shake.
@@ -38,32 +37,31 @@ private:
      */
     sf::RenderWindow* window = nullptr;
 
-public:
-
-	/**
-	 * \public
-	 * \return A reference on the game window
-	 */
+  public:
+    /**
+     * \public
+     * \return A reference on the game window
+     */
     sf::RenderWindow& getWindow();
 
     /**
-	 * \public
-	 * \param w The game window 
-	 */
+     * \public
+     * \param w The game window
+     */
     void setWindow(sf::RenderWindow& w);
 
     /**
-	 * \public
-	 * Shakes the camera according to the given parameters
-	 * \param shakeIntensity The intensity of the shaking
-	 * \param shakeTime The duration of the shaking
-	 */
+     * \public
+     * Shakes the camera according to the given parameters
+     * \param shakeIntensity The intensity of the shaking
+     * \param shakeTime The duration of the shaking
+     */
     void shake(float shakeIntensity, sf::Time shakeTime);
 
     /**
-	 * \public
-	 * \param dt The time since the last frame
-	 */
+     * \public
+     * \param dt The time since the last frame
+     */
     void update(sf::Time dt);
 };
 
