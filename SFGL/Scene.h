@@ -16,19 +16,19 @@ private:
      * \private
      * A pointer to the game object 
      */
-    Game* game;
+    Game* game_;
 
     /**
      * \private
      * A pointer to the resource manager 
      */
-    ResourceManager* resources;
+    ResourceManager* resources_;
 
     /**
      * \private
      * A pointer to the window 
      */
-    sf::RenderWindow* window;
+    sf::RenderWindow* window_;
 
     /**
      * \private
@@ -42,20 +42,20 @@ protected:
 	 * \return A reference to the game
 	 * \see Game 
 	 */
-    Game& getGame();
+    Game& game();
 
     /**
 	 * \protected
 	 * \return A reference on the resources
 	 * \see ResourceManager
 	 */
-    ResourceManager& getResources();
+    ResourceManager& resources();
 
     /**
 	 * \protected
 	 * \return A reference on the game window 
 	 */
-    sf::RenderWindow& getWindow();
+    sf::RenderWindow& window();
 
 public:
     /**

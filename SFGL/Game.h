@@ -32,7 +32,7 @@ private:
 	 * \private
 	 * Manages all the resources.
 	 */
-    ResourceManager resources;
+    ResourceManager resources_;
 
     /** 
 	 * \private
@@ -62,13 +62,13 @@ private:
 	 * \private
 	 * Main window.
 	 */
-    sf::RenderWindow window;
+    sf::RenderWindow window_;
 
     /** 
 	 * \private
 	 * Video mode of the main window.
 	 */
-    sf::VideoMode windowMode;
+    sf::VideoMode windowMode_;
 
     /** 
 	 * \private
@@ -135,19 +135,19 @@ public:
 	 * \return A reference to the Game::resources.
 	 * \see ResourceManager
 	 */
-    ResourceManager& getResources();
+    ResourceManager& resources();
 
     /**
 	 * \public
 	 * \return A reference to the main window.
 	 */
-    sf::RenderWindow& getWindow();
+    sf::RenderWindow& window();
 
     /**
 	 * \public
 	 * \return A reference to the dimensions of the main window.
 	 */
-    sf::VideoMode& getVideoMode();
+    sf::VideoMode& videoMode();
 
     /**
 	 * \public

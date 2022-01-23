@@ -1,18 +1,18 @@
 #include "Game.h"
 
 Game::Game(const std::string& windowTitle, const sf::VideoMode& videoMode, const sf::Uint32& style) 
-    : windowTitle(windowTitle), windowMode(videoMode)
+    : windowTitle(windowTitle), windowMode_(videoMode)
 {
     srand(static_cast<unsigned int>(time(nullptr)));
 
     // Initialize the window
-    window.create(videoMode, windowTitle, style);
-    window.setFramerateLimit(framerateLimit);
+    window_.create(videoMode, windowTitle, style);
+    window_.setFramerateLimit(framerateLimit);
 
     // Initialize the camera
-    camera.setCenter(window.getDefaultView().getCenter());
-    camera.setSize(window.getDefaultView().getSize());
-    camera.setWindow(window);
+    camera.setCenter(window_.getDefaultView().getCenter());
+    camera.setSize(window_.getDefaultView().getSize());
+    camera.setWindow(window_);
 }
 
 void Game::addScene(const std::string& label, Scene* scene)
@@ -33,29 +33,29 @@ void Game::setCurrentScene(const std::string& label)
     scenes[label]->setInitialized(true);
 }
 
-ResourceManager& Game::getResources()
+ResourceManager& Game::resources()
 {
-    return resources;
+    return resources_;
 }
 
-sf::RenderWindow& Game::getWindow()
+sf::RenderWindow& Game::window()
 {
-    return window;
+    return window_;
 }
 
-sf::VideoMode& Game::getVideoMode()
+sf::VideoMode& Game::videoMode()
 {
-    return windowMode;
+    return windowMode_;
 }
 
 void Game::setVideoMode(const sf::VideoMode& mode, const sf::Uint32& style)
 {
-    window.create(mode, windowTitle, style);
-    window.setFramerateLimit(framerateLimit);
-    windowMode = mode;
+    window_.create(mode, windowTitle, style);
+    window_.setFramerateLimit(framerateLimit);
+    windowMode_ = mode;
 
-    camera.setCenter(window.getDefaultView().getCenter());
-    camera.setSize(window.getDefaultView().getSize());
+    camera.setCenter(window_.getDefaultView().getCenter());
+    camera.setSize(window_.getDefaultView().getSize());
     // TODO : Check camera.setWindow(window);
 }
 
@@ -67,7 +67,7 @@ unsigned short Game::getFramerateLimit() const
 void Game::setFramerateLimit(unsigned short rate)
 {
     framerateLimit = rate;
-    window.setFramerateLimit(framerateLimit);
+    window_.setFramerateLimit(framerateLimit);
 }
 
 void Game::launch()
@@ -84,21 +84,21 @@ void Game::launch()
     if (scenes.find(currentScene) == scenes.end())
         throw std::runtime_error("The scene " + currentScene + " was not found");
     
-    window.setFramerateLimit(framerateLimit);
+    window_.setFramerateLimit(framerateLimit);
     
     gameClock.restart();
     // TODO : Find usage for framerateClock.restart();
     updateClock.restart();
 
     // Main loop
-    while (window.isOpen())
+    while (window_.isOpen())
     {
         // Handle events
-        while (window.pollEvent(ev))
+        while (window_.pollEvent(ev))
         {
             scenes[currentScene]->update(updateClock.getElapsedTime(), ev);
             if (ev.type == sf::Event::Closed)
-                window.close();
+                window_.close();
         }
 
         // Update the scene
@@ -106,12 +106,12 @@ void Game::launch()
 
         // Update the camera
         camera.update(updateClock.restart());
-        window.setView(camera);
+        window_.setView(camera);
 
         // Draw the scene
-        window.clear();
+        window_.clear();
         scenes[currentScene]->render();
-        window.display();
+        window_.display();
 
         // Update the framerate
         // TODO : Find usage for framerateClock.restart();
@@ -123,17 +123,17 @@ void Game::launch()
 
 void Game::stop()
 {
-    window.close();
+    window_.close();
 }
 
 bool Game::setWindowShape(const sf::Image& image) const
 {
-	return ::setWShape(window.getSystemHandle(), image);
+	return ::setWShape(window_.getSystemHandle(), image);
 }
 
 bool Game::setWindowTransparency(unsigned char alpha) const
 {
-	return ::setWTransparency(window.getSystemHandle(), alpha);
+	return ::setWTransparency(window_.getSystemHandle(), alpha);
 }
 
 Camera& Game::getCamera()
