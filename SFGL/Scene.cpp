@@ -7,9 +7,7 @@ void Scene::setGame(Game& game)
     this->window = &game.getWindow();
 }
 
-sfg::SFGUI& Scene::getGui()
 {
-    return gui;
 }
 
 Game& Scene::getGame()

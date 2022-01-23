@@ -3,8 +3,6 @@
 
 #include "Game.h"
 #include <SFML/Graphics.hpp>
-#include <SFGUI/SFGUI.hpp>
-#include <SFGUI/Widgets.hpp>
 
 class Game;
 
@@ -14,8 +12,6 @@ class Game;
 class Scene
 {
 private:
-	sfg::SFGUI gui;
-
     /**
      * \private
      * A pointer to the game object 
@@ -41,12 +37,6 @@ private:
     bool initialized = false;
 
 protected:
-    /**
-     * \protected
-     * \return The gui object
-     */
-    sfg::SFGUI& getGui();
-
     /**
 	 * \protected
 	 * \return A reference to the game

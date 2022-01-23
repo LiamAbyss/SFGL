@@ -1,6 +1,3 @@
-#include <SFGUI/SFGUI.hpp>
-#include <SFGUI/Widgets.hpp>
-
 #include <SFML/Graphics.hpp>
 
 #include "Game.h"
