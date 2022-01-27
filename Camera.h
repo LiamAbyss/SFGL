@@ -38,7 +38,23 @@ private:
      */
     sf::RenderWindow* window = nullptr;
 
+    float shakeFreqX;
+    float shakeFreqY;
+    float shakeFreqY2;
+    float shakeSizeX;
+    float shakeSizeY;
+    float shakeSizeY2;
+
+    void processShaking(float offsetX, float offsetY);
+
 public:
+
+    void setCenterX(float x);
+    void setCenterY(float y);
+    void setCenter(float x, float y);
+    void setCenter(const sf::Vector2f& center);
+    void move(float offsetX, float offsetY);
+    void move(const sf::Vector2f& offset);
 
 	/**
 	 * \public

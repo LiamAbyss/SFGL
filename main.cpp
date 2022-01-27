@@ -1,160 +1,194 @@
 #include <SFML/Graphics.hpp>
+#include <sstream>
 #include "Game.h"
+#include "Sprite.h"
 
-class BezierCurve
+class AnimatedScene : public Scene
 {
-public:
-	std::vector<sf::Vector2f> controlPoints;
+	sfg::Sprite building;
+	sfg::Sprite projectile;
+	sf::Sprite background;
+	sf::Sprite ground;
 
-	sf::Vector2f compute(float t) const
-	{
-		return compute(controlPoints, t);
-	}
-
-	static sf::Vector2f compute(const std::vector<sf::Vector2f>& controlPoints, float t)
-	{
-		if (controlPoints.empty()) throw std::runtime_error("No control points were defined for the Bezier curve.");
-
-		if (controlPoints.size() == 1)
-		{
-			return controlPoints[0];
-		}
-		if (controlPoints.size() == 2)
-		{
-			float x = controlPoints[0].x + (controlPoints[1].x - controlPoints[0].x) * t;
-			float y = controlPoints[0].y + (controlPoints[1].y - controlPoints[0].y) * t;
-
-			return { x, y };
-		}
-
-		std::vector<sf::Vector2f> tPoints(controlPoints.size() - 1);
-
-		for (int i = 0; i < controlPoints.size() - 1; i++)
-		{
-			float x = controlPoints[i].x + (controlPoints[i + 1].x - controlPoints[i].x) * t;
-			float y = controlPoints[i].y + (controlPoints[i + 1].y - controlPoints[i].y) * t;
-
-			tPoints[i] = { x, y };
-		}
-		return compute(tPoints, t);
-	}
-};
-
-class Cinemator
-{
-private:
-	std::vector<BezierCurve> curves;
-	float animDuration = 1.F;
-	sf::Time progress = sf::Time::Zero;
-	std::vector<sf::Time> pauses;
-	sf::Transformable* object;
-
-public:
-	void setDuration(float duration)
-	{
-		animDuration = duration;
-	}
-
-	void addPoint(sf::Vector2f point)
-	{
-		if (curves.size() == pauses.size())
-			curves.push_back(BezierCurve());
-		curves[curves.size() - 1].controlPoints.push_back(point);
-	}
-
-	void addPause(sf::Time pause)
-	{
-		if (curves.empty()) return;
-		if (curves.size() != pauses.size())
-			pauses.push_back(sf::Time::Zero);
-		pauses[pauses.size() - 1] += pause;
-	}
-
-	void setObject(sf::Transformable& obj)
-	{
-		object = &obj;
-	}
-
-	bool playCinematic(sf::Time dt)
-	{
-		float durationPerCurve = animDuration / static_cast<float>(curves.size());
-
-		// Get the id of the current curve
-		auto id = static_cast<int>(static_cast<float>(curves.size()) * (progress.asSeconds() / animDuration));
-
-		if(id > 0 && id < curves.size() && pauses[id - 1].asSeconds() > 0)
-		{
-			pauses[id - 1] -= dt;
-			if (pauses[id - 1].asSeconds() < 0) progress += -pauses[id - 1];
-			return true;
-		}
-		
-		progress += dt;
-		if (progress.asSeconds() >= animDuration) 
-		{
-			object->setPosition(curves[curves.size() - 1].controlPoints[curves[curves.size() - 1].controlPoints.size() - 1]);
-			return false;
-		}
-
-		float t = (progress.asSeconds() - static_cast<float>(id) * durationPerCurve) / durationPerCurve;
-		object->setPosition(curves[id].compute(t));
-
-		return true;
-	}
-
-};
-
-class Cinematic : public Scene
-{
-	Cinemator rectCinemator;
-	sf::RectangleShape rect;
-	sf::Time delay = sf::Time::Zero;
+	float groundLevel = 0;
+	bool inAnimation = false;
 
 	// Hérité via Scene
 	void initialize() override
 	{
-		rect.setFillColor(sf::Color::Red);
-		rect.setPosition(0, 0);
-		rect.setSize(sf::Vector2f(30, 30));
+		resources().load("background", "Assets/city1.png");
+		resources().load("ground", "Assets/ground.png");
+		resources().load("building/walk", "Assets/walk.png");
+		resources().load("building/dash", "Assets/dash.png");
+		resources().load("building/punch", "Assets/punch.png");
+		resources().load("building/throw", "Assets/throw.png");
+		resources().load("building/thunder", "Assets/thunder.png");
+		resources().load("projectile", "Assets/water.png");
 
-		rectCinemator.setObject(rect);
-		rectCinemator.addPoint({ 0, 0 });
-		rectCinemator.addPoint({ 150, 200 });
-		rectCinemator.addPoint({ 50, 310 });
-		//rectCinemator.addPause(sf::seconds(1));
-		rectCinemator.addPoint({ 50, 310 });
-		rectCinemator.addPoint({ 550, 310 });
-		rectCinemator.addPoint({ 620, 54 });
-		rectCinemator.addPoint({ 0, 0 });
-		rectCinemator.setDuration(10);
+		int repeats = 5;
+
+		// BACKGROUND
+		GTexture backTexture = resources().getTexture("background");
+		backTexture->setRepeated(true);
+		background.setTexture(*backTexture);
+		background.setTextureRect(sf::IntRect(0, 0, backTexture->getSize().x * repeats, backTexture->getSize().y));
+		background.setScale(
+			static_cast<float>(window().getSize().x) / static_cast<float>(backTexture->getSize().x),
+			static_cast<float>(window().getSize().y) / static_cast<float>(backTexture->getSize().y)
+		);
+		background.setPosition(-(float)backTexture->getSize().x * (float)(repeats / 2), 0);
+
+		// GROUND
+		GTexture groundTexture = resources().getTexture("ground");
+		groundTexture->setRepeated(true);
+		ground.setTexture(*groundTexture);
+		ground.setTextureRect(sf::IntRect(0, 0, groundTexture->getSize().x * repeats, groundTexture->getSize().y));
+		ground.setScale(
+			static_cast<float>(window().getSize().x) / static_cast<float>(groundTexture->getSize().x),
+			static_cast<float>(window().getSize().y) * 0.15F / static_cast<float>(groundTexture->getSize().y)
+		);
+		ground.setPosition(-(float)groundTexture->getSize().x * (float)(repeats / 2), window().getSize().y * 0.85F);
+
+		// PLAYER
+		building.init(resources());
+
+		building.createAnim("walk", "building/walk", 6, 0, 5, 10);
+		building.createAnim("dash", "building/dash", 4, 0, 3, 10, false);
+		building.createAnim("punch", "building/punch", 3, 0, 2, 10, false);
+		building.createAnim("throw", "building/throw", 7, 0, 6, 10, false);
+		building.createAnim("thunder", "building/thunder", 10, 0, 9, 10, false);
+		building.setCurrentAnim("walk");
+
+		groundLevel = ground.getPosition().y;
+		building.setPosition(50, groundLevel);
+
+		projectile.init(resources());
+		projectile.createAnim("default", "projectile", 4, 0, 3, 5);
+		projectile.setCurrentAnim("default");
+		projectile.setScale(1.8F, 1.8F);
+		projectile.setPosition(-200, -200);
 	}
 
 	void update(sf::Time dt, sf::Event& ev) override
 	{
+		if (inAnimation) return;
+		if (ev.type == sf::Event::KeyPressed)
+		{
+			if (ev.key.code == sf::Keyboard::Q)
+			{
+				building.setCurrentAnim("punch");
+				inAnimation = true;
+			}
+			else if (ev.key.code == sf::Keyboard::D)
+			{
+				building.setCurrentAnim("dash");
+				inAnimation = true;
+			}
+			else if (ev.key.code == sf::Keyboard::S)
+			{
+				building.setCurrentAnim("throw");
+				inAnimation = true;
+			}
+			else if (ev.key.code == sf::Keyboard::Z)
+			{
+				building.setCurrentAnim("thunder");
+				inAnimation = true;
+			}
+		}
 	}
 
 	void update(sf::Time dt) override
 	{
-		delay += dt;
-		if(delay.asSeconds() > 2)
+		building.setOrigin(0, building.getGlobalBounds().height);
+		building.animate(dt);
+		projectile.animate(dt);
+		float deltaX = 0;
+		float posY = groundLevel;
+		float speed = 300.F;
+		float height = 200.F;
+
+		if (!inAnimation)
 		{
-			rectCinemator.playCinematic(dt);
+			// Flipping
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+				building.flip(false);
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+				building.flip(true);
+
+			// Moving
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+				deltaX += dt.asSeconds() * speed;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+				deltaX -= dt.asSeconds() * speed;
 		}
+		else
+		{
+			std::string key = building.getAnimationKey();
+			if (key == "dash")
+			{
+				deltaX += dt.asSeconds() * speed * 2 * (building.isFlipped() ? -1 : 1);
+			}
+			else if (key == "thunder")
+			{
+				float progress = building.getAnimationProgress();
+				if (progress < 0.5F)
+				{
+					posY = progress * -height + groundLevel;
+				}
+				else if (progress >= 0.8F)
+					posY = (progress - 1.F) * height * 2 + groundLevel;
+				else
+					posY = building.getPosition().y;
+			}
+
+			inAnimation = !building.isAnimationFinished();
+			if (!inAnimation)
+			{
+				if (key == "throw")
+				{
+					projectile.flip(building.isFlipped());
+					sf::FloatRect rect = building.getGlobalBounds();
+					sf::Vector2f offset(35, 85);
+					if (projectile.isFlipped())
+					{
+						projectile.setPosition(rect.left - projectile.getGlobalBounds().width + offset.x, rect.top + offset.y);
+					}
+					else
+					{
+						projectile.setPosition(rect.left + rect.width - offset.x, rect.top + offset.y);
+					}
+				}
+				else if (key == "thunder")
+				{
+					game().getCamera().shake(20, sf::milliseconds(150));
+				}
+				building.resetAnim(building.getAnimationKey());
+				building.setCurrentAnim("walk");
+			}
+		}
+		building.move(deltaX, 0);
+		building.setPosition(building.getPosition().x, posY);
+		projectile.move(dt.asSeconds() * speed * 0.9F * (projectile.isFlipped() ? -1 : 1), 0);
+		game().getCamera().setCenterX(building.getPosition().x + building.getGlobalBounds().width / 2);
 	}
 
 	void render() override
 	{
-		//Draw splashscreen
-		window().draw(rect);
+		window().draw(background);
+		window().draw(ground);
+
+		window().draw(building);
+		
+		window().draw(projectile);
 	}
 };
 
 int main() {
 
-	Game game("Cinematic example", sf::VideoMode(1300, 900), sf::Style::Default);
+	Game game("Animated scene example", sf::VideoMode(1300, 900), sf::Style::Default);
 
-	game.addScene("Cinematic", new Cinematic());
-	game.setCurrentScene("Cinematic");
+	game.addScene("Anim", new AnimatedScene());
+	game.setCurrentScene("Anim");
 
 	game.launch();
 
