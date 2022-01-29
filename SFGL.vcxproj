@@ -149,6 +149,9 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Curves\CatmullRomCurve.cpp" />
+    <ClCompile Include="Curves\Curve.cpp" />
+    <ClCompile Include="Curves\LinearCurve.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -159,6 +162,10 @@
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Curves\CatmullRomCurve.h" />
+    <ClInclude Include="Curves\Curve.h" />
+    <ClInclude Include="Curves\Curves.h" />
+    <ClInclude Include="Curves\LinearCurve.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="JsonHeader\json.hpp" />
     <ClInclude Include="ResourceManager.h" />

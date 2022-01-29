@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\Curves">
+      <UniqueIdentifier>{2b2ddd40-f074-48ed-93ee-a34ff656bb08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Curves">
+      <UniqueIdentifier>{8a6edd60-700c-4205-aa5a-f13755d1bf1e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -39,6 +45,15 @@
     <ClCompile Include="Sprite.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="Curves\CatmullRomCurve.cpp">
+      <Filter>Fichiers sources\Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="Curves\Curve.cpp">
+      <Filter>Fichiers sources\Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="Curves\LinearCurve.cpp">
+      <Filter>Fichiers sources\Curves</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene.h">
@@ -64,6 +79,18 @@
     </ClInclude>
     <ClInclude Include="Sprite.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Curves\CatmullRomCurve.h">
+      <Filter>Fichiers d%27en-tête\Curves</Filter>
+    </ClInclude>
+    <ClInclude Include="Curves\Curve.h">
+      <Filter>Fichiers d%27en-tête\Curves</Filter>
+    </ClInclude>
+    <ClInclude Include="Curves\LinearCurve.h">
+      <Filter>Fichiers d%27en-tête\Curves</Filter>
+    </ClInclude>
+    <ClInclude Include="Curves\Curves.h">
+      <Filter>Fichiers d%27en-tête\Curves</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

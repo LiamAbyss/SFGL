@@ -2,193 +2,133 @@
 #include <sstream>
 #include "Game.h"
 #include "Sprite.h"
+#include "Curves/Curves.h"
 
-class AnimatedScene : public Scene
+class SplineScene : public Scene
 {
-	sfg::Sprite building;
-	sfg::Sprite projectile;
-	sf::Sprite background;
-	sf::Sprite ground;
+	CatmullRomCurve lcurve;
 
-	float groundLevel = 0;
-	bool inAnimation = false;
+	sf::VertexArray points;
+	sf::VertexArray triangle;
+
+	sf::CircleShape circle;
+
+	float cursor = 0.0F;
+
+	std::vector<sf::Vector2f> controlPoints;
+	int selected = -1;
 
 	// Hérité via Scene
 	void initialize() override
 	{
-		resources().load("background", "Assets/city1.png");
-		resources().load("ground", "Assets/ground.png");
-		resources().load("building/walk", "Assets/walk.png");
-		resources().load("building/dash", "Assets/dash.png");
-		resources().load("building/punch", "Assets/punch.png");
-		resources().load("building/throw", "Assets/throw.png");
-		resources().load("building/thunder", "Assets/thunder.png");
-		resources().load("projectile", "Assets/water.png");
+		points.setPrimitiveType(sf::PrimitiveType::LineStrip);
+		triangle.setPrimitiveType(sf::PrimitiveType::Triangles);
 
-		int repeats = 5;
+		circle.setRadius(5);
+		circle.setFillColor(sf::Color::Blue);
+	}
 
-		// BACKGROUND
-		GTexture backTexture = resources().getTexture("background");
-		backTexture->setRepeated(true);
-		background.setTexture(*backTexture);
-		background.setTextureRect(sf::IntRect(0, 0, backTexture->getSize().x * repeats, backTexture->getSize().y));
-		background.setScale(
-			static_cast<float>(window().getSize().x) / static_cast<float>(backTexture->getSize().x),
-			static_cast<float>(window().getSize().y) / static_cast<float>(backTexture->getSize().y)
-		);
-		background.setPosition(-(float)backTexture->getSize().x * (float)(repeats / 2), 0);
-
-		// GROUND
-		GTexture groundTexture = resources().getTexture("ground");
-		groundTexture->setRepeated(true);
-		ground.setTexture(*groundTexture);
-		ground.setTextureRect(sf::IntRect(0, 0, groundTexture->getSize().x * repeats, groundTexture->getSize().y));
-		ground.setScale(
-			static_cast<float>(window().getSize().x) / static_cast<float>(groundTexture->getSize().x),
-			static_cast<float>(window().getSize().y) * 0.15F / static_cast<float>(groundTexture->getSize().y)
-		);
-		ground.setPosition(-(float)groundTexture->getSize().x * (float)(repeats / 2), window().getSize().y * 0.85F);
-
-		// PLAYER
-		building.init(resources());
-
-		building.createAnim("walk", "building/walk", 6, 0, 5, 10);
-		building.createAnim("dash", "building/dash", 4, 0, 3, 10, false);
-		building.createAnim("punch", "building/punch", 3, 0, 2, 10, false);
-		building.createAnim("throw", "building/throw", 7, 0, 6, 10, false);
-		building.createAnim("thunder", "building/thunder", 10, 0, 9, 10, false);
-		building.setCurrentAnim("walk");
-
-		groundLevel = ground.getPosition().y;
-		building.setPosition(50, groundLevel);
-
-		projectile.init(resources());
-		projectile.createAnim("default", "projectile", 4, 0, 3, 5);
-		projectile.setCurrentAnim("default");
-		projectile.setScale(1.8F, 1.8F);
-		projectile.setPosition(-200, -200);
+	float distance2(sf::Vector2f a, sf::Vector2f b)
+	{
+		return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 	}
 
 	void update(sf::Time dt, sf::Event& ev) override
 	{
-		if (inAnimation) return;
-		if (ev.type == sf::Event::KeyPressed)
+		sf::Vector2f pos = (sf::Vector2f)sf::Mouse::getPosition(window());
+		if (ev.type == sf::Event::MouseMoved && selected != -1)
 		{
-			if (ev.key.code == sf::Keyboard::Q)
+			controlPoints[selected] = pos;
+			lcurve.setControlPoints(controlPoints);
+			points.clear();
+			for (float t = 0.0F; t < lcurve.getMaxT(); t += 0.005F)
 			{
-				building.setCurrentAnim("punch");
-				inAnimation = true;
+				points.append(sf::Vertex(lcurve.getPoint(t)));
 			}
-			else if (ev.key.code == sf::Keyboard::D)
+		}
+		else if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Button::Left)
+		{
+			for (int i = 0; i < controlPoints.size(); i++)
 			{
-				building.setCurrentAnim("dash");
-				inAnimation = true;
+				auto& p = controlPoints[i];
+				if (distance2(p, pos) < 5 * 5)
+				{
+					selected = i;
+				}
 			}
-			else if (ev.key.code == sf::Keyboard::S)
+		}
+		else if (ev.type == sf::Event::MouseButtonReleased)
+		{
+			if (ev.mouseButton.button == sf::Mouse::Button::Left)
 			{
-				building.setCurrentAnim("throw");
-				inAnimation = true;
+				selected = -1;
 			}
-			else if (ev.key.code == sf::Keyboard::Z)
+			if (ev.mouseButton.button == sf::Mouse::Button::Right)
 			{
-				building.setCurrentAnim("thunder");
-				inAnimation = true;
+				controlPoints.push_back(pos);
+				lcurve.setControlPoints(controlPoints);
+				points.clear();
+				for (float t = 0.0F; t < lcurve.getMaxT(); t += 0.005F)
+				{
+					points.append(sf::Vertex(lcurve.getPoint(t)));
+				}
+			}
+		}
+		else if (ev.type == sf::Event::KeyReleased)
+		{
+			if (ev.key.code == sf::Keyboard::Space)
+				lcurve.setClosed(!lcurve.isClosed()); 
+			points.clear();
+			for (float t = 0.0F; t < lcurve.getMaxT(); t += 0.005F)
+			{
+				points.append(sf::Vertex(lcurve.getPoint(t)));
 			}
 		}
 	}
 
 	void update(sf::Time dt) override
 	{
-		building.setOrigin(0, building.getGlobalBounds().height);
-		building.animate(dt);
-		projectile.animate(dt);
-		float deltaX = 0;
-		float posY = groundLevel;
-		float speed = 300.F;
-		float height = 200.F;
+		// Draw agent to demonstrate gradient
+		if (lcurve.getControlPoints().size() < 2) return;
 
-		if (!inAnimation)
-		{
-			// Flipping
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-				building.flip(false);
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-				building.flip(true);
+		if (cursor >= lcurve.getCurveLength())
+			cursor -= lcurve.getCurveLength();
+		triangle.clear();
+		float offset = lcurve.getNormalisedOffset(cursor);
+		sf::Vector2f p1 = lcurve.getPoint(offset);
+		sf::Vector2f g1 = lcurve.getGradient(offset);
+		float gLen = std::sqrtf(g1.x * g1.x + g1.y * g1.y);
+		sf::Vector2f normalizedG = {g1.x / gLen, g1.y / gLen};
+		float r = atan2(-g1.y, g1.x);
+		triangle.append(sf::Vector2f(15.0F * sin(r) + p1.x, 15.0F * cos(r) + p1.y));
+		triangle.append(sf::Vector2f(-15.0F * sin(r) + p1.x, -15.0F * cos(r) + p1.y));
+		sf::Vector2f midPoint = {
+			0.5F * (triangle[0].position.x + triangle[1].position.x),
+			0.5F * (triangle[0].position.y + triangle[1].position.y),
+		};
+		triangle.append(sf::Vector2f(midPoint.x + 30.0F * normalizedG.x, midPoint.y + 30.0F * normalizedG.y));
 
-			// Moving
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-				deltaX += dt.asSeconds() * speed;
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-				deltaX -= dt.asSeconds() * speed;
-		}
-		else
-		{
-			std::string key = building.getAnimationKey();
-			if (key == "dash")
-			{
-				deltaX += dt.asSeconds() * speed * 2 * (building.isFlipped() ? -1 : 1);
-			}
-			else if (key == "thunder")
-			{
-				float progress = building.getAnimationProgress();
-				if (progress < 0.5F)
-				{
-					posY = progress * -height + groundLevel;
-				}
-				else if (progress >= 0.8F)
-					posY = (progress - 1.F) * height * 2 + groundLevel;
-				else
-					posY = building.getPosition().y;
-			}
-
-			inAnimation = !building.isAnimationFinished();
-			if (!inAnimation)
-			{
-				if (key == "throw")
-				{
-					projectile.flip(building.isFlipped());
-					sf::FloatRect rect = building.getGlobalBounds();
-					sf::Vector2f offset(35, 85);
-					if (projectile.isFlipped())
-					{
-						projectile.setPosition(rect.left - projectile.getGlobalBounds().width + offset.x, rect.top + offset.y);
-					}
-					else
-					{
-						projectile.setPosition(rect.left + rect.width - offset.x, rect.top + offset.y);
-					}
-				}
-				else if (key == "thunder")
-				{
-					game().getCamera().shake(20, sf::milliseconds(150));
-				}
-				building.resetAnim(building.getAnimationKey());
-				building.setCurrentAnim("walk");
-			}
-		}
-		building.move(deltaX, 0);
-		building.setPosition(building.getPosition().x, posY);
-		projectile.move(dt.asSeconds() * speed * 0.9F * (projectile.isFlipped() ? -1 : 1), 0);
-		game().getCamera().setCenterX(building.getPosition().x + building.getGlobalBounds().width / 2);
+		cursor += dt.asSeconds() * 150.F;
 	}
 
 	void render() override
 	{
-		window().draw(background);
-		window().draw(ground);
-
-		window().draw(building);
-		
-		window().draw(projectile);
+		for (const auto& p : lcurve.getControlPoints())
+		{
+			circle.setPosition(p.x - 5, p.y - 5);
+			window().draw(circle);
+		}
+		window().draw(points);
+		window().draw(triangle);
 	}
 };
 
 int main() {
 
-	Game game("Animated scene example", sf::VideoMode(1300, 900), sf::Style::Default);
+	Game game("Interpolating curves scene example", sf::VideoMode(1300, 900), sf::Style::Default);
 
-	game.addScene("Anim", new AnimatedScene());
-	game.setCurrentScene("Anim");
+	game.addScene("Curves", new SplineScene());
+	game.setCurrentScene("Curves");
 
 	game.launch();
 
