@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "Sprite.h"
 #include "Curves/Curves.h"
+#include "Geometry.h"
 
 using namespace sfg;
 
@@ -12,6 +13,7 @@ class SplineScene : public Scene
 
 	sf::VertexArray points;
 	sf::VertexArray triangle;
+	sf::CircleShape triangle2;
 
 	sf::CircleShape circle;
 
@@ -28,11 +30,10 @@ class SplineScene : public Scene
 
 		circle.setRadius(5);
 		circle.setFillColor(sf::Color::Blue);
-	}
 
-	float distance2(sf::Vector2f a, sf::Vector2f b)
-	{
-		return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+		triangle2.setPointCount(3);
+		triangle2.setRadius(15);
+		triangle2.setOrigin(15, 15);
 	}
 
 	void update(sf::Time dt, sf::Event& ev) override
@@ -86,7 +87,7 @@ class SplineScene : public Scene
 				points.append(sf::Vertex(lcurve.getPoint(t)));
 			}
 		}
-	}
+	}	
 
 	void update(sf::Time dt) override
 	{
@@ -97,10 +98,15 @@ class SplineScene : public Scene
 
 		// Draw agent to demonstrate gradient
 		float offset = lcurve.getNormalisedOffset(cursor);
+
+		// Get next pos
 		sf::Vector2f p1 = lcurve.getPoint(offset);
-		sf::Vector2f g1 = lcurve.getGradient(offset);
+
+		// Get orientation
+		/*sf::Vector2f g1 = lcurve.getGradient(offset);
 		float gLen = std::sqrtf(g1.x * g1.x + g1.y * g1.y);
 		sf::Vector2f normalizedG = {g1.x / gLen, g1.y / gLen};
+
 		float r = atan2(-g1.y, g1.x);
 		triangle.clear();
 		triangle.append(sf::Vector2f(15.0F * sin(r) + p1.x, 15.0F * cos(r) + p1.y));
@@ -109,7 +115,13 @@ class SplineScene : public Scene
 			0.5F * (triangle[0].position.x + triangle[1].position.x),
 			0.5F * (triangle[0].position.y + triangle[1].position.y),
 		};
-		triangle.append(sf::Vector2f(midPoint.x + 30.0F * normalizedG.x, midPoint.y + 30.0F * normalizedG.y));
+		triangle.append(sf::Vector2f(midPoint.x + 30.0F * normalizedG.x, midPoint.y + 30.0F * normalizedG.y));*/
+
+		// Or
+		float r = getOrientation(lcurve.getPoint(std::max(0.0F, offset - 0.005F)), p1);
+	
+		triangle2.setPosition(p1);
+		triangle2.setRotation(toDegrees(r)+90.F);
 
 		cursor += dt.asSeconds() * 150.F;
 	}
@@ -122,7 +134,7 @@ class SplineScene : public Scene
 			window().draw(circle);
 		}
 		window().draw(points);
-		window().draw(triangle);
+		window().draw(triangle2);
 	}
 };
 
