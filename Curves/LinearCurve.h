@@ -1,18 +1,24 @@
-#pragma once
+#ifndef INCLUDE_LINEAR_CURVE
+#define INCLUDE_LINEAR_CURVE
 #include "Curve.h"
 
-class LinearCurve : public Curve
+namespace sfg
 {
-public:
+	class LinearCurve : public Curve
+	{
+	public:
 
-	sf::Vector2f getPoint(float t) override;
+		sf::Vector2f getPoint(float t) override;
 
-	sf::Vector2f getGradient(float t) override;
+		sf::Vector2f getGradient(float t) override;
 
-	void setClosed(bool closed) override;
+		void setClosed(bool closed) override;
 
-	float getMaxT() override;
+		float getMaxT() override;
 
-	void setControlPoints(const std::vector<sf::Vector2f>& points) override;
-};
+		void setControlPoints(const std::vector<sf::Vector2f>& points) override;
+	};
+}
 
+
+#endif // !INCLUDE_LINEAR_CURVE

@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "Game.h"
 
+using namespace sfg;
 class BezierCurve
 {
 public:

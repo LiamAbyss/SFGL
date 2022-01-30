@@ -1,4 +1,6 @@
-#pragma once
+#ifndef INCLUDE_ANIMATION
+#define INCLUDE_ANIMATION
+
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
 
@@ -51,3 +53,5 @@ namespace sfg
 		static Animation build(GTexture spritesheet, size_t framesInSpritesheet, size_t start, size_t end, uint32_t framerate, sf::Sprite& sprite, bool repeat = true);
 	};
 }
+
+#endif // !INCLUDE_ANIMATION

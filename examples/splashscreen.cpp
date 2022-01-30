@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "../Game.h"
 
+using namespace sfg;
 class SplashScreen : public Scene
 {
 	// Duration of the splashscreen
@@ -10,7 +11,7 @@ class SplashScreen : public Scene
 	sf::Texture imgtext;
 	sf::Sprite img;
 
-	// Hérité via Scene
+	// Hï¿½ritï¿½ via Scene
 	void initialize() override
 	{
 		//Load splash image

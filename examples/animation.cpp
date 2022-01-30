@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "Sprite.h"
 
+using namespace sfg;
 class AnimatedScene : public Scene
 {
 	sfg::Sprite building;

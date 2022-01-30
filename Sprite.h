@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INCLUDE_SPRITE
+#define INCLUDE_SPRITE
 #include <SFML/Graphics.hpp>
 #include <sstream>
 #include "Animation.h"
@@ -20,7 +21,7 @@ namespace sfg
 		void init(ResourceManager& resources);
 
 		void createAnim(const std::string& key, const std::string& resourceName, size_t framesInSpritesheet, size_t start, size_t end, uint32_t framerate, bool repeat = true);
-	
+
 		void resetAnim(const std::string& key);
 
 		void setCurrentAnim(const std::string& key);
@@ -40,7 +41,8 @@ namespace sfg
 
 		void assertKey(const std::string& key);
 
-        bool isFlipped() const;
+		bool isFlipped() const;
 	};
 
 }
+#endif // !INCLUDE_SPRITE

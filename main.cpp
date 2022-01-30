@@ -4,6 +4,8 @@
 #include "Sprite.h"
 #include "Curves/Curves.h"
 
+using namespace sfg;
+
 class SplineScene : public Scene
 {
 	CatmullRomCurve lcurve;
@@ -88,18 +90,19 @@ class SplineScene : public Scene
 
 	void update(sf::Time dt) override
 	{
-		// Draw agent to demonstrate gradient
 		if (lcurve.getControlPoints().size() < 2) return;
 
 		if (cursor >= lcurve.getCurveLength())
 			cursor -= lcurve.getCurveLength();
-		triangle.clear();
+
+		// Draw agent to demonstrate gradient
 		float offset = lcurve.getNormalisedOffset(cursor);
 		sf::Vector2f p1 = lcurve.getPoint(offset);
 		sf::Vector2f g1 = lcurve.getGradient(offset);
 		float gLen = std::sqrtf(g1.x * g1.x + g1.y * g1.y);
 		sf::Vector2f normalizedG = {g1.x / gLen, g1.y / gLen};
 		float r = atan2(-g1.y, g1.x);
+		triangle.clear();
 		triangle.append(sf::Vector2f(15.0F * sin(r) + p1.x, 15.0F * cos(r) + p1.y));
 		triangle.append(sf::Vector2f(-15.0F * sin(r) + p1.x, -15.0F * cos(r) + p1.y));
 		sf::Vector2f midPoint = {
