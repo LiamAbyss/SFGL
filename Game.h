@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include <fstream>
 #include <map>
 #include <string>
 #include <ctime>
@@ -12,6 +13,7 @@
 #include "TransparentWindow.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "Config.h"
 
 namespace sfg
 {
@@ -35,6 +37,12 @@ namespace sfg
 		 * Manages all the resources.
 		 */
 		ResourceManager resources_;
+
+		/**
+		 * \private
+		 * Manages all the configs.
+		 */
+		Config config_;
 
 		/**
 		 * \private
@@ -110,12 +118,29 @@ namespace sfg
 
 		/**
 		 * \public
+		 * Game constructor
+		 * \param configPath Path of the game config file
+		 */
+		Game(const std::string& configPath);
+
+		/**
+		 * \public
 		 * Adds a scene to be loaded afterwards.
 		 * \param label Label of the scene.
 		 * \param scene A pointer on the scene allocated with \c new.
 		 * \see Scene
 		 */
 		void addScene(const std::string& label, Scene* scene);
+
+		/**
+		 * \public
+		 * Adds a scene to be loaded afterwards.
+		 * \param label Label of the scene.
+		 * \param scene A pointer on the scene allocated with \c new.
+		 * \param configPath Path of the config file.
+		 * \see Scene
+		 */
+		void addScene(const std::string& label, Scene* scene, const std::string& config);
 
 		/**
 		 * \public
@@ -138,6 +163,13 @@ namespace sfg
 		 * \see ResourceManager
 		 */
 		ResourceManager& resources();
+
+		/**
+		 * \public
+		 * \return A reference to the Game::config.
+		 * \see Config
+		 */
+		Config& config();
 
 		/**
 		 * \public

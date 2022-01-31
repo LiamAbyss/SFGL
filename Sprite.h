@@ -2,7 +2,9 @@
 #define INCLUDE_SPRITE
 #include <SFML/Graphics.hpp>
 #include <sstream>
+#include "Config.h"
 #include "Animation.h"
+#include "Scene.h"
 
 namespace sfg
 {
@@ -15,10 +17,11 @@ namespace sfg
 		bool flipped = false;
 
 		ResourceManager* resources;
+		Config* config;
 
 	public:
 
-		void init(ResourceManager& resources);
+		void init(Scene* scene);
 
 		void createAnim(const std::string& key, const std::string& resourceName, size_t framesInSpritesheet, size_t start, size_t end, uint32_t framerate, bool repeat = true);
 
@@ -42,6 +45,8 @@ namespace sfg
 		void assertKey(const std::string& key);
 
 		bool isFlipped() const;
+
+		bool loadFromConfig(const std::string& key);
 	};
 
 }

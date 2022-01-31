@@ -2,6 +2,7 @@
 #define INCLUDE_SCENE
 
 #include "Game.h"
+#include "Config.h"
 #include <SFML/Graphics.hpp>
 
 namespace sfg
@@ -28,6 +29,12 @@ namespace sfg
 
 		/**
 		 * \private
+		 * A pointer to the configuration
+		 */
+		Config* config_;
+
+		/**
+		 * \private
 		 * A pointer to the window
 		 */
 		sf::RenderWindow* window_;
@@ -38,28 +45,34 @@ namespace sfg
 		 */
 		bool initialized = false;
 
-	protected:
+	public:
 		/**
-		 * \protected
+		 * \public
 		 * \return A reference to the game
 		 * \see Game
 		 */
 		Game& game();
 
 		/**
-		 * \protected
+		 * \public
 		 * \return A reference on the resources
 		 * \see ResourceManager
 		 */
 		ResourceManager& resources();
 
 		/**
-		 * \protected
+		 * \public
+		 * \return A reference on the configuration
+		 * \see Config
+		 */
+		Config& config();
+
+		/**
+		 * \public
 		 * \return A reference on the game window
 		 */
 		sf::RenderWindow& window();
 
-	public:
 		/**
 		 * \public
 		 * Used in Game::addScene() to initialize the protected attributes.
@@ -68,6 +81,8 @@ namespace sfg
 		 * \note You should not call this method yourself.
 		 */
 		void setGame(Game& game);
+
+		void loadFromConfig(const std::string& config);
 
 		virtual ~Scene() = default;
 

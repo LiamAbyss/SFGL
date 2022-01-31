@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Config.cpp" />
     <ClCompile Include="Curves\CatmullRomCurve.cpp" />
     <ClCompile Include="Curves\Curve.cpp" />
     <ClCompile Include="Curves\LinearCurve.cpp" />
@@ -163,6 +164,7 @@
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="Curves\CatmullRomCurve.h" />
     <ClInclude Include="Curves\Curve.h" />
     <ClInclude Include="Curves\Curves.h" />

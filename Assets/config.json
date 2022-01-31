@@ -1,0 +1,19 @@
+{
+    "title": "Config file example",
+    "videoMode": {
+        "width": 1300,
+        "height": 900
+    },
+    "comment": "Style can be Close, Default, Fullscreen, None, Resize, Titlebar",
+    "style": [
+        "Default"
+    ],
+    "resources" : [],
+    "spriteConfigs": [],
+    "sceneConfigs": [
+        {
+            "name": "config/ConfigScene",
+            "path": "assets/ConfigScene.json"
+        }
+    ]
+}

@@ -1,8 +1,9 @@
 #include "Sprite.h"
 
-void sfg::Sprite::init(ResourceManager& resources)
+void sfg::Sprite::init(Scene* scene)
 {
-	this->resources = &resources;
+	this->resources = &scene->resources();
+	this->config = &scene->config();
 }
 
 void sfg::Sprite::createAnim(const std::string& key, const std::string& resourceName, size_t framesInSpritesheet, size_t start, size_t end, uint32_t framerate, bool repeat)
@@ -84,5 +85,43 @@ void sfg::Sprite::assertKey(const std::string& key)
 bool sfg::Sprite::isFlipped() const
 {
     return flipped;
+}
+
+bool sfg::Sprite::loadFromConfig(const std::string& key)
+{
+	nlohmann::json conf = config->getConfig(key);
+
+	std::string name = conf["name"];
+
+	// Load resources
+	nlohmann::json res = conf["resources"];
+
+	for (const auto& r : res)
+	{
+		resources->load(r["name"], r["path"]);
+	}
+
+	// Load anims
+	nlohmann::json animations = conf["animations"];
+
+	bool didSetCurrentAnim = false;
+
+	for (const auto& anim : animations)
+	{
+		createAnim(
+			anim["name"],
+			anim["resource"],
+			anim["framesInSpritesheet"],
+			anim["startFrame"],
+			anim["endFrame"],
+			anim["framerate"],
+			anim["loop"]
+		);
+
+		if (anim["active"] && didSetCurrentAnim)
+			throw std::runtime_error("Several animations have been initialized as \"active\" : " + currentAnim + " and " + (std::string)anim["name"]);
+		else if (anim["active"])
+			setCurrentAnim(anim["name"]);
+	}
 }
 

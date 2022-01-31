@@ -17,10 +17,85 @@ namespace sfg
         camera.setWindow(window_);
     }
 
+    Game::Game(const std::string& configPath)
+    {
+        nlohmann::json conf;
+        std::ifstream file;
+        file.open(configPath);
+
+        if (!file.is_open())
+            throw std::runtime_error("Couldn't open config file");
+
+        file >> conf;
+        file.close();
+
+        sf::Uint32 style = 0;
+
+        for (const auto& s : conf["style"])
+        {
+            if (s == "Close")
+                style |= sf::Style::Close;
+            else if (s == "Default")
+                style |= sf::Style::Default;
+            else if (s == "Fullscreen")
+                style |= sf::Style::Fullscreen;
+            else if (s == "None")
+                style |= sf::Style::None;
+            else if (s == "Resize")
+                style |= sf::Style::Resize;
+            else if (s == "Titlebar")
+                style |= sf::Style::Titlebar;
+        }
+
+        windowTitle = conf["title"];
+        windowMode_ = sf::VideoMode(conf["videoMode"]["width"], conf["videoMode"]["height"]);
+
+        srand(static_cast<unsigned int>(time(nullptr)));
+
+        // Initialize the window
+        window_.create(windowMode_, windowTitle, style);
+        window_.setFramerateLimit(framerateLimit);
+
+        // Initialize the camera
+        camera.setCenter(window_.getDefaultView().getCenter());
+        camera.setSize(window_.getDefaultView().getSize());
+        camera.setWindow(window_);
+
+        // Load resources
+        nlohmann::json res = conf["resources"];
+
+        for (const auto& r : res)
+        {
+            resources_.load(r["name"], r["path"]);
+        }
+        
+        // Load scenes
+        nlohmann::json sc = conf["sceneConfigs"];
+
+        for (const auto& s : sc)
+        {
+            config_.loadConfig(s["name"], s["path"]);
+        }
+
+        // Load sprite configs
+        nlohmann::json spriteConfigs = conf["spriteConfigs"];
+        for (const auto& c : spriteConfigs)
+        {
+            config_.loadConfig(c["name"], c["path"]);
+        }
+
+    }
+
     void Game::addScene(const std::string& label, Scene* scene)
     {
         scenes.try_emplace(label, std::shared_ptr<Scene>(scene));
         scenes[label]->setGame((Game&)*this);
+    }
+
+    void Game::addScene(const std::string& label, Scene* scene, const std::string& config)
+    {
+        addScene(label, scene);
+        scenes[label]->loadFromConfig(config);
     }
 
     std::map<std::string, std::shared_ptr<Scene>, std::less<>>& Game::getScenes()
@@ -38,6 +113,11 @@ namespace sfg
     ResourceManager& Game::resources()
     {
         return resources_;
+    }
+
+    Config& Game::config()
+    {
+        return config_;
     }
 
     sf::RenderWindow& Game::window()
@@ -99,7 +179,12 @@ namespace sfg
             while (window_.pollEvent(ev))
             {
                 scenes[currentScene]->update(updateClock.getElapsedTime(), ev);
-                if (ev.type == sf::Event::Closed)
+
+                if (ev.type == sf::Event::Resized)
+                {
+                    getCamera().setSize(static_cast<float>(ev.size.width), static_cast<float>(ev.size.height));
+                }
+                else if (ev.type == sf::Event::Closed)
                     window_.close();
             }
 
@@ -147,5 +232,4 @@ namespace sfg
     {
         return ev;
     }
-
 }

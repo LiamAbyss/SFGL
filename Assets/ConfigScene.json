@@ -1,0 +1,9 @@
+{
+    "resources" : [],
+    "spriteConfigs": [
+        {
+            "name": "config/building",
+            "path": "assets/building.json"
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "name" : "building",
+    "resources" : [
+        {
+            "name" : "building/walk",
+            "path" : "Assets/walk.png"
+        }
+    ],
+    "animations" : [
+        {
+            "name" : "building/walk",
+            "resource" : "building/walk",
+            "framesInSpritesheet" : 6,
+            "startFrame" : 0,
+            "endFrame" : 5,
+            "framerate" : 10,
+            "loop" : true,
+            "active" : true
+        }
+    ]
+}
