@@ -1,49 +1,72 @@
 #include <SFML/Graphics.hpp>
 #include <sstream>
 #include "Game.h"
-#include "Sprite.h"
+#include "Geometry.h"
+#include "Combo.h"
+#include "SFUtils.h"
 
 using namespace sfg;
 
-class ConfigScene : public Scene
+
+class Test : public Scene
 {
-	Sprite building;
+	Combo combo;
 
 	// Hérité via Scene
 	void initialize() override
 	{
-		building.init(this);
-
-		building.loadFromConfig("config/building");
-
-		building.setPosition(100, 100);
+		sf::Time delay = sf::milliseconds(300);
+		combo
+			.hold(sf::Keyboard::S, delay)
+			.hold(sf::Keyboard::D, delay)
+			.unhold(sf::Keyboard::S, delay)
+			.then(sf::Keyboard::Numpad4)
+			.orElse()
+			.hold(sf::Keyboard::S, delay)
+			.hold(sf::Keyboard::D, delay)
+			.unhold(sf::Keyboard::S, delay)
+			.unhold(sf::Keyboard::D, delay)
+			.then(sf::Keyboard::Numpad4)
+			.orElse()
+			.then(sf::Keyboard::S, delay)
+			.then(sf::Keyboard::D, delay)
+			.then(sf::Keyboard::Numpad4)
+			.orElse()
+			.then(sf::Keyboard::S, delay)
+			.hold(sf::Keyboard::D, delay)
+			.then(sf::Keyboard::Numpad4);
 	}
 
 	void update(sf::Time dt, sf::Event& ev) override
 	{
-		if (ev.type == sf::Event::Resized)
-		{
-			building.setPosition(100, 100);
-		}
+		if (combo.handle(ev))
+			std::cout << "HADOKEN" << std::endl;
+		if (ev.type == sf::Event::KeyReleased)
+			std::cout << "Released ";
+		if (ev.type == sf::Event::KeyPressed)
+			std::cout << "Pressed ";
+		if (ev.type == sf::Event::KeyReleased || ev.type == sf::Event::KeyPressed)
+			std::cout << SFUtils::getKeyName(ev.key.code) << std::endl;
+		if (ev.key.code == sf::Keyboard::Key::Space)
+			std::cout << "\n";
 	}	
 
 	void update(sf::Time dt) override
 	{
-		building.animate(dt);
+
 	}
 
 	void render() override
 	{
-		window().draw(building);
 	}
 };
 
 int main() {
 
-	Game game("Assets/config.json");
+	Game game("Test", sf::VideoMode(1300, 900), sf::Style::Default);
 
-	game.addScene("ConfigScene", new ConfigScene(), "config/ConfigScene");
-	game.setCurrentScene("ConfigScene");
+	game.addScene("test", new Test());
+	game.setCurrentScene("test");
 
 	game.launch();
 

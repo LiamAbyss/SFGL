@@ -10,6 +10,7 @@ namespace sfg
         // Initialize the window
         window_.create(videoMode, windowTitle, style);
         window_.setFramerateLimit(framerateLimit);
+        window_.setKeyRepeatEnabled(false);
 
         // Initialize the camera
         camera.setCenter(window_.getDefaultView().getCenter());
@@ -55,6 +56,7 @@ namespace sfg
         // Initialize the window
         window_.create(windowMode_, windowTitle, style);
         window_.setFramerateLimit(framerateLimit);
+        window_.setKeyRepeatEnabled(false);
 
         // Initialize the camera
         camera.setCenter(window_.getDefaultView().getCenter());
@@ -134,6 +136,7 @@ namespace sfg
     {
         window_.create(mode, windowTitle, style);
         window_.setFramerateLimit(framerateLimit);
+        window_.setKeyRepeatEnabled(false);
         windowMode_ = mode;
 
         camera.setCenter(window_.getDefaultView().getCenter());
