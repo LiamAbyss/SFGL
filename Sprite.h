@@ -5,14 +5,19 @@
 #include "Config.h"
 #include "Animation.h"
 #include "Scene.h"
+#include "Hitbox.h"
+
+// TODO : MET TOUT BIEN
 
 namespace sfg
 {
+	class Hitbox;
 
 	class Sprite : public sf::Sprite
 	{
 	private:
 		std::map<std::string, Animation, std::less<>> anims;
+		std::map<std::string, std::vector<std::vector<Hitbox>>, std::less<>> hitboxes;
 		std::string currentAnim;
 		bool flipped = false;
 
@@ -28,6 +33,10 @@ namespace sfg
 		void resetAnim(const std::string& key);
 
 		void setCurrentAnim(const std::string& key);
+
+		void loadHitboxes(const std::string& key, const std::string& configName);
+
+		void drawHitboxes(sf::RenderTarget& target);
 
 		void flip(bool orientation);
 
@@ -47,6 +56,10 @@ namespace sfg
 		bool isFlipped() const;
 
 		bool loadFromConfig(const std::string& key);
+
+		bool doesCollide(sfg::Sprite& sprite);
+
+		sf::Vector2f avoidCollide(sfg::Sprite& sprite, sfg::Axis axis = sfg::Axis::None);
 	};
 
 }

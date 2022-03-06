@@ -19,6 +19,8 @@ namespace sfg
 {
 	float getOrientation(const sf::Vector2f& from, const sf::Vector2f& to);
 
+	sf::Vector2f getProjAxis(const sf::Vector2f& a, const sf::Vector2f& b);
+
 	float toDegrees(float radians);
 
 	float toRadians(float degrees);

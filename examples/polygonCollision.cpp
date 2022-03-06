@@ -1,169 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include <sstream>
 #include "Game.h"
-#include "Sprite.h"
 #include "Geometry.h"
 
 using namespace sfg;
 
-
-class HitboxScene : public Scene
-{
-	sfg::Sprite building;
-	sfg::Sprite ground;
-	sf::Sprite background;
-
-	bool inAnimation = false;
-
-	// Hérité via Scene
-	void initialize() override
-	{
-		resources().load("background", "Assets/city1.png");
-		resources().load("ground", "Assets/ground.png");
-		/*resources().load("building/walk", "Assets/building/walk.png");
-		resources().load("building/dash", "Assets/building/dash.png");
-
-		config().loadConfig("building/walk", "Assets/building/walk.json");
-		config().loadConfig("building/dash", "Assets/building/dash.json");*/
-		config().loadConfig("ground/hitbox", "Assets/ground.json");
-
-		// BACKGROUND
-		GTexture backTexture = resources().getTexture("background");
-		backTexture->setRepeated(true);
-		background.setTexture(*backTexture);
-		background.setTextureRect(sf::IntRect(0, 0, backTexture->getSize().x, backTexture->getSize().y));
-		background.setScale(
-			static_cast<float>(window().getSize().x) / static_cast<float>(backTexture->getSize().x),
-			static_cast<float>(window().getSize().y) / static_cast<float>(backTexture->getSize().y)
-		);
-
-		// GROUND
-		GTexture groundTexture = resources().getTexture("ground");
-		ground.init(this);
-		ground.setScale(
-			static_cast<float>(window().getSize().x) / static_cast<float>(groundTexture->getSize().x),
-			static_cast<float>(window().getSize().y) * 0.15F / static_cast<float>(groundTexture->getSize().y)
-		);
-		ground.setPosition(0, (float)window().getSize().y * 0.85F);
-
-		ground.createAnim("ground", "ground", 1, 0, 0, 0);
-		ground.setCurrentAnim("ground");
-
-		ground.loadHitboxes("ground", "ground/hitbox");
-
-		// PLAYER
-		building.init(this);
-		config().loadConfig("config/building", "Assets/building/building.json");
-		building.loadFromConfig("config/building");
-		/*building.createAnim("walk", "building/walk", 6, 0, 5, 10);
-		building.createAnim("dash", "building/dash", 4, 0, 3, 10, false);
-		building.setCurrentAnim("walk");
-
-
-		building.loadHitboxes("walk", "building/walk");
-		building.loadHitboxes("dash", "building/dash");*/
-
-		float groundLevel = ground.getPosition().y;
-		building.setPosition(50, groundLevel - 400);
-	}
-
-	void update(sf::Time dt, sf::Event& ev) override
-	{
-		if (inAnimation) return;
-		if (ev.type == sf::Event::KeyPressed)
-		{
-			if (ev.key.code == sf::Keyboard::D)
-			{
-				building.setCurrentAnim("dash");
-				inAnimation = true;
-			}
-		}
-	}
-
-	void update(sf::Time dt) override
-	{
-		building.setOrigin(0, building.getGlobalBounds().height);
-		float deltaX = 0;
-		float speed = 300.F;
-
-		if (!inAnimation)
-		{
-			// Flipping
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-				building.flip(false);
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-				building.flip(true);
-
-			// Moving
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-				deltaX += dt.asSeconds() * speed;
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-				deltaX -= dt.asSeconds() * speed;
-		}
-		else
-		{
-			std::string key = building.getAnimationKey();
-			if (key == "dash")
-			{
-				deltaX += dt.asSeconds() * speed * 2 * (building.isFlipped() ? -1 : 1);
-			}
-
-			inAnimation = !building.isAnimationFinished();
-			if (!inAnimation)
-			{
-				building.resetAnim(building.getAnimationKey());
-				building.setCurrentAnim("walk");
-			}
-		}
-		building.move(deltaX, 0);
-
-		building.move(0, 100 * dt.asSeconds());
-		building.animate(dt);
-		ground.animate(dt);
-		if (building.doesCollide(ground))
-		{
-			sf::Vector2f d = building.avoidCollide(ground, sfg::Axis::Y);
-
-			building.move(d.x, d.y);
-		}
-
-		building.animate(sf::Time::Zero);
-		ground.animate(sf::Time::Zero);
-	}
-
-	void render() override
-	{
-		window().draw(background);
-		window().draw(ground);
-		window().draw(building);
-
-		building.drawHitboxes(window());
-		ground.drawHitboxes(window());
-	}
-};
-
-int main() {
-
-	Game game("Hitboxes example", sf::VideoMode(1300, 900), sf::Style::Default);
-
-	game.addScene("Hitbox", new HitboxScene());
-	game.setCurrentScene("Hitbox");
-
-	game.launch();
-
-	return 0;
-}
-
-
-//#include <SFML/Graphics.hpp>
-//#include <sstream>
-//#include "Game.h"
-//#include "Geometry.h"
-//#include "Polygon.h"
-//
-//using namespace sfg;
-
-/*namespace sfg
+namespace sfg 
 {
 	class Polygon
 	{
@@ -214,23 +56,21 @@ int main() {
 			return axisProj;
 		}
 	};
-}*/
+}
 
-/*class Collision : public Scene
+class Collision : public Scene
 {
-	sfg::Polygon rect = sfg::Polygon();
-	sfg::Polygon tri = sfg::Polygon();
+	sfg::Polygon rect;
+	sfg::Polygon tri;
 
 	float triLength = 50;
-	float sqLength = 3200;
+	float sqLength = 200;
 	float r = 0.F;
 
-	/*sf::Vector2f doesCollideSAT_Static(const sfg::Polygon& r1, const sfg::Polygon& r2)
+	bool doesCollideSAT_Static(sfg::Polygon& r1, sfg::Polygon& r2)
 	{
-		const sfg::Polygon* p1 = &r1;
-		const sfg::Polygon* p2 = &r2;
-
-		sf::Vector2f res = { 0, 0 };
+		sfg::Polygon* p1 = &r1;
+		sfg::Polygon* p2 = &r2;
 
 		float overlap = INFINITY;
 
@@ -276,7 +116,7 @@ int main() {
 				}
 
 				if (!(max_r2 >= min_r1 && max_r1 >= min_r2))
-					return { 0,0 };
+					return false;
 
 				// Calculate actual overlap along projected axis, and store the minimum
 				overlap = std::min(std::min(max_r1, max_r2) - std::max(min_r1, min_r2), overlap);
@@ -286,11 +126,9 @@ int main() {
 		// by overlap along the vector between the two object centers
 		sf::Vector2f d = { r2.pos.x - r1.pos.x, r2.pos.y - r1.pos.y };
 		float s = sqrtf(d.x * d.x + d.y * d.y);
-		res = {
-			-overlap * d.x / s,
-			-overlap * d.y / s
-		};
-		return res;
+		r1.pos.x -= overlap * d.x / s;
+		r1.pos.y -= overlap * d.y / s;
+		return true;
 	}
 
 	bool doesCollideSAT(sfg::Polygon& r1, sfg::Polygon& r2)
@@ -388,13 +226,11 @@ int main() {
 		return false;
 	}
 
-	sf::Vector2f doesCollideDiags_Static(const sfg::Polygon& r1, const sfg::Polygon& r2)
+	bool doesCollideDiags_Static(sfg::Polygon& r1, sfg::Polygon& r2)
 	{
-		const sfg::Polygon* poly1 = &r1;
-		const sfg::Polygon* poly2 = &r2;
-
-		sf::Vector2f res = { 0, 0 };
-
+		sfg::Polygon* poly1 = &r1;
+		sfg::Polygon* poly2 = &r2;
+		bool res = false;
 		for (int shape = 0; shape < 2; shape++)
 		{
 			if (shape == 1)
@@ -426,31 +262,31 @@ int main() {
 					{
 						displacement.x += (1.0f - t1) * (line_r1e.x - line_r1s.x);
 						displacement.y += (1.0f - t1) * (line_r1e.y - line_r1s.y);
+						res = true;
 					}
 				}
-				if (displacement.x > 6000)
-					std::cout << "ok";
-				res.x += displacement.x * (shape == 0 ? -1 : +1);
-				res.y += displacement.y * (shape == 0 ? -1 : +1);
+
+				r1.pos.x += displacement.x * (shape == 0 ? -1 : +1);
+				r1.pos.y += displacement.y * (shape == 0 ? -1 : +1);
 			}
 		}
 
 		return res;
-	}*/
+	}
 
-	// Hérité via Scene
-	/*void initialize() override
+	// HÃ©ritÃ© via Scene
+	void initialize() override
 	{
-		rect.pos = { 300, 3700 };
-		//rect.vertices.setPrimitiveType(sf::PrimitiveType::LinesStrip);
-		rect.baseVertices.push_back(sf::Vector2f(-sqLength, -sqLength));
-		rect.baseVertices.push_back(sf::Vector2f(-sqLength, sqLength));
+		rect.pos = { 300, 600 };
+		rect.vertices.setPrimitiveType(sf::PrimitiveType::LinesStrip);
+		rect.baseVertices.push_back(sf::Vector2f(- sqLength,- sqLength));
+		rect.baseVertices.push_back(sf::Vector2f(- sqLength, sqLength));
 		rect.baseVertices.push_back(sf::Vector2f(sqLength, sqLength));
 		rect.baseVertices.push_back(sf::Vector2f(sqLength, -sqLength));
-		rect.baseVertices.push_back(sf::Vector2f(-sqLength, -sqLength));
+		rect.baseVertices.push_back(sf::Vector2f(- sqLength, - sqLength));
 
 		tri.pos = { 100, 100 };
-		//tri.vertices.setPrimitiveType(sf::PrimitiveType::LinesStrip);
+		tri.vertices.setPrimitiveType(sf::PrimitiveType::LinesStrip);
 		tri.baseVertices.push_back(sf::Vector2f(-triLength, -triLength));
 		tri.baseVertices.push_back(sf::Vector2f(-triLength, triLength));
 
@@ -463,11 +299,13 @@ int main() {
 
 	void update(sf::Time dt, sf::Event& ev) override
 	{
-	}
+	}	
 
 	void update(sf::Time dt) override
 	{
 		sf::Vector2f axisProj;
+
+		rect.update();
 
 		axisProj = tri.getAxisProjection(0, 1);
 
@@ -489,15 +327,10 @@ int main() {
 			tri.angle += 100 * dt.asSeconds();
 		}
 
-		rect.update();
-		tri.update();
-
 		sf::Color color = sf::Color::White;
-		sf::Vector2f d = sfg::Polygon::doesCollideDiags_Static(tri, rect);
-		if (d != sf::Vector2f(0,0))
+		if (doesCollideDiags_Static(rect, tri))
 		{
 			color = sf::Color::Red;
-			tri.pos += d;
 		}
 
 		tri.update(color);
@@ -506,8 +339,8 @@ int main() {
 
 	void render() override
 	{
-		rect.draw(window());
-		tri.draw(window());
+		window().draw(rect.vertices);
+		window().draw(tri.vertices);
 	}
 };
 
@@ -521,4 +354,4 @@ int main() {
 	game.launch();
 
 	return 0;
-}*/
+}

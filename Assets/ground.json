@@ -1,0 +1,35 @@
+{
+    "entity": {
+        "frames": [
+            [
+                {
+                    "type": "hitbox",
+                    "vertices": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 1598,
+                            "y": 0
+                        },
+                        {
+                            "x": 1598,
+                            "y": 183
+                        },
+                        {
+                            "x": 0,
+                            "y": 183
+                        },
+                        {
+                            "x": 0,
+                            "y": 0
+                        }
+                    ]
+                }
+            ]
+        ],
+        "name": "ground",
+        "path": "D:\\VisualStudioProjects\\2021 - 2022\\SFGL\\Assets\\ground.png"
+    }
+}

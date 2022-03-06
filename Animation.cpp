@@ -100,8 +100,8 @@ namespace sfg
         anim.start = start;
         anim.end = end;
         anim.currentFrame = start;
-        anim.framerate = framerate;
-        anim.frameDuration = sf::seconds(1.F / static_cast<float>(framerate));
+        anim.framerate = framerate < 1 ? 1 : framerate;
+        anim.frameDuration = sf::seconds(1.F / static_cast<float>(anim.framerate));
         anim.sprite = &sprite;
         anim.repeat = repeat;
         return anim;

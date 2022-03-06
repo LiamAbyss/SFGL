@@ -1,0 +1,47 @@
+{
+    "name" : "building",
+    "resources" : [
+        {
+            "name" : "building/walk",
+            "path" : "Assets/building/walk.png"
+        },
+        {
+            "name" : "building/dash",
+            "path" : "Assets/building/dash.png"
+        }
+    ],
+    "animations" : [
+        {
+            "name" : "walk",
+            "resource" : "building/walk",
+            "framesInSpritesheet" : 6,
+            "startFrame" : 0,
+            "endFrame" : 5,
+            "framerate" : 10,
+            "loop" : true,
+            "active" : true
+        },
+        {
+            "name" : "dash",
+            "resource" : "building/dash",
+            "framesInSpritesheet" : 4,
+            "startFrame" : 0,
+            "endFrame" : 3,
+            "framerate" : 10,
+            "loop" : false,
+            "active" : false
+        }
+    ],
+    "hitboxes" : [
+        {
+            "name" : "walk",
+            "config" : "building/walk",
+            "path" : "Assets/building/walk.json"
+        },
+        {
+            "name" : "dash",
+            "config" : "building/dash",
+            "path" : "Assets/building/dash.json"
+        }
+    ]
+}

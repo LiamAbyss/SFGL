@@ -6,6 +6,19 @@ float sfg::getOrientation(const sf::Vector2f& from, const sf::Vector2f& to)
 	return -atan2(-gradient.y, gradient.x);
 }
 
+sf::Vector2f sfg::getProjAxis(const sf::Vector2f& a, const sf::Vector2f& b)
+{
+	sf::Vector2f axisProj;
+	axisProj = {
+		-(b.y - a.y),
+		b.x - a.x
+	};
+	float d = sqrtf(axisProj.x * axisProj.x + axisProj.y * axisProj.y);
+	axisProj = { axisProj.x / d, axisProj.y / d };
+
+	return axisProj;
+}
+
 float sfg::toDegrees(float radians)
 {
 	return radians * static_cast<float>(M_180_PI);

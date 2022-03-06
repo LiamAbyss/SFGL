@@ -17,6 +17,7 @@
 
 namespace sfg
 {
+
 	class Scene;
 
 	/**
