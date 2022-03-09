@@ -112,3 +112,32 @@ std::string sfg::SFUtils::getKeyName(const sf::Keyboard::Key& key)
             return "Unknown";
     }
 }
+
+std::vector<std::string> sfg::SFUtils::split(std::string str, const std::string& delimiter)
+{
+    std::vector<std::string> tokens;
+    size_t pos = 0;
+    std::string token;
+    while ((pos = str.find(delimiter)) != std::string::npos)
+    {
+        token = str.substr(0, pos);
+        tokens.push_back(token);
+        str.erase(0, pos + delimiter.length());
+    }
+    tokens.push_back(str);
+    return tokens;
+}
+
+std::string sfg::SFUtils::join(const std::vector<std::string>& strings, const std::string& delimiter)
+{
+    std::stringstream ss;
+
+    for (size_t i = 0; i < strings.size(); i++)
+    {
+        ss << strings[i];
+        if (i != strings.size() - 1) {
+            ss << delimiter;
+        }
+    }
+    return ss.str();
+}
