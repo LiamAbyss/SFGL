@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <string>
+#include <sstream>
 #include "JsonHeader/json.hpp"
 #include <iostream>
 #include <Windows.h>
@@ -16,6 +17,7 @@ namespace sfg
     using GSoundBuffer = std::shared_ptr<sf::SoundBuffer>;
     using GJson = std::shared_ptr<nlohmann::json>;
     using GFont = std::shared_ptr<sf::Font>;
+    using GRaw = std::shared_ptr<sf::String>;
 
     /**
      * Manages all the resources.
@@ -57,6 +59,12 @@ namespace sfg
 
         /**
          * \private
+         * Contains all the raw files.
+         */
+        std::map<std::string, GRaw> rawHolder;
+
+        /**
+         * \private
          * The limit in size between SFML SoundBuffers and Musics.
          * Default value is 1Mo.
          * \note SoundBuffers are loaded into the memory while Musics are streamed directly from their file.
@@ -82,6 +90,14 @@ namespace sfg
          * \see GFont
          */
         GFont getFont(const std::string& key);
+
+        /**
+         * \private
+         * \param key The key associated to the resource.
+         * \return The string associated to the key.
+         * \see GRaw
+         */
+        GRaw getRaw(const std::string& key);
 
         /**
          * \private

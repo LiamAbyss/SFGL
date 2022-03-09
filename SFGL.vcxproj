@@ -156,6 +156,7 @@
     <ClCompile Include="Curves\LinearCurve.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Geometry.cpp" />
+    <ClCompile Include="Hitbox.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="Curves\LinearCurve.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Geometry.h" />
+    <ClInclude Include="Hitbox.h" />
     <ClInclude Include="JsonHeader\json.hpp" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="ResourceManager.h" />

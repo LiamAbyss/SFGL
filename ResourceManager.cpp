@@ -51,7 +51,7 @@ namespace sfg
 		// If the file is an image, load it as a texture
 		if (type.substr(0, type.find("/")) == "image")
 		{
-			textureHolder.emplace(key, std::make_shared<sf::Texture>());
+			textureHolder.try_emplace(key, std::make_shared<sf::Texture>());
 			textureHolder[key]->loadFromFile(file);
 		}
 		// If the file is a json, load it as a json
@@ -62,7 +62,7 @@ namespace sfg
 			{
 				nlohmann::json j;
 				jFile >> j;
-				jsonHolder.emplace(key, std::make_shared<nlohmann::json>(j));
+				jsonHolder.try_emplace(key, std::make_shared<nlohmann::json>(j));
 				return true;
 			}
 			else
@@ -81,14 +81,14 @@ namespace sfg
 			// If the file is short, load it as a sound buffer
 			else if (static_cast<unsigned long long>(size) <= audioLimit)
 			{
-				soundHolder.emplace(key, std::make_shared<sf::SoundBuffer>());
+				soundHolder.try_emplace(key, std::make_shared<sf::SoundBuffer>());
 				soundHolder[key]->loadFromFile(file);
 				return true;
 			}
 			// If the file is long, load it as a music
 			else
 			{
-				musicHolder.emplace(key, std::make_shared<sf::Music>());
+				musicHolder.try_emplace(key, std::make_shared<sf::Music>());
 				musicHolder[key]->openFromFile(file);
 				return true;
 			}
@@ -96,9 +96,25 @@ namespace sfg
 		// If the file is a font, load it as a font
 		else if (file.substr(file.find_last_of('.'), file.size() - file.find_last_of('.')) == ".ttf")
 		{
-			fontHolder.emplace(key, std::make_shared<sf::Font>());
+			fontHolder.try_emplace(key, std::make_shared<sf::Font>());
 			fontHolder[key]->loadFromFile(file);
 			return true;
+		}
+		else
+		{
+			// Load the file as raw text
+			std::ifstream rFile(file);
+			if (rFile.is_open())
+			{
+				std::stringstream ss;
+				ss << rFile.rdbuf();
+				rawHolder.try_emplace(key, std::make_shared<sf::String>(ss.str()));
+				return true;
+			}
+			else
+			{
+				std::cout << "Failed to load raw " << file << ". Reason: Unable to open file" << std::endl;
+			}
 		}
 
 		return false;
@@ -110,6 +126,16 @@ namespace sfg
 		if (fontHolder.find(key) != fontHolder.end())
 		{
 			return fontHolder[key];
+		}
+		return nullptr;
+	}
+
+	GRaw ResourceManager::getRaw(const std::string& key)
+	{
+		// If the raw string is not loaded, return a nullptr
+		if (rawHolder.find(key) != rawHolder.end())
+		{
+			return rawHolder[key];
 		}
 		return nullptr;
 	}
