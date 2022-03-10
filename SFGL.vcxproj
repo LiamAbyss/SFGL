@@ -161,7 +161,7 @@
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="SFUtils.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="TransparentWindow.cpp" />
   </ItemGroup>
@@ -182,7 +182,7 @@
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Scene.h" />
-    <ClInclude Include="SFUtils.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="TransparentWindow.h" />
   </ItemGroup>

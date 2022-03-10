@@ -1,9 +1,9 @@
-#include "SFUtils.h"
+#include "Utils.h"
 
 /**
  * Returns the name of the key passed as parameter.
  */
-std::string sfg::SFUtils::getKeyName(const sf::Keyboard::Key& key)
+std::string sfg::utils::sfml::getKeyName(const sf::Keyboard::Key& key)
 {
     // 0-25 are letters
     if (key >= sf::Keyboard::A && key <= sf::Keyboard::Z)
@@ -113,7 +113,7 @@ std::string sfg::SFUtils::getKeyName(const sf::Keyboard::Key& key)
     }
 }
 
-std::vector<std::string> sfg::SFUtils::split(std::string str, const std::string& delimiter)
+std::vector<std::string> sfg::utils::strings::split(std::string str, const std::string& delimiter)
 {
     std::vector<std::string> tokens;
     size_t pos = 0;
@@ -128,7 +128,7 @@ std::vector<std::string> sfg::SFUtils::split(std::string str, const std::string&
     return tokens;
 }
 
-std::string sfg::SFUtils::join(const std::vector<std::string>& strings, const std::string& delimiter)
+std::string sfg::utils::strings::join(const std::vector<std::string>& strings, const std::string& delimiter)
 {
     std::stringstream ss;
 
@@ -140,4 +140,85 @@ std::string sfg::SFUtils::join(const std::vector<std::string>& strings, const st
         }
     }
     return ss.str();
+}
+
+std::string sfg::utils::strings::toUpper(const std::string& str)
+{
+    std::stringstream upper;
+    for (const auto& item : str)
+    {
+        upper << toupper(item);
+    }
+    return upper.str();
+}
+
+std::string sfg::utils::strings::toLower(const std::string& str)
+{
+    std::stringstream lower;
+    for (const auto& item : str)
+    {
+        lower << tolower(item);
+    }
+    return lower.str();
+}
+
+std::string sfg::utils::strings::strip(const std::string& str)
+{
+    auto start_it = str.begin();
+    auto end_it = str.rbegin();
+
+    while (std::isspace(*start_it) != 0)
+        ++start_it;
+    while (std::isspace(*end_it) != 0)
+        ++end_it;
+
+    return std::string(start_it, end_it.base());
+}
+
+template<typename TK, typename TV>
+std::vector<TK> sfg::utils::maps::extractKeys(std::map<TK, TV> const& inputMap)
+{
+    std::vector<TK> retval;
+    retval.reserve(inputMap.size());
+    for (auto const& element : inputMap)
+    {
+        retval.emplace_back(element.first);
+    }
+    return retval;
+}
+
+template<typename TK, typename TV>
+std::vector<TV> sfg::utils::maps::extractValues(std::map<TK, TV> const& inputMap)
+{
+    std::vector<TV> retval;
+    retval.reserve(inputMap.size());
+    for (auto const& element : inputMap)
+    {
+        retval.emplace_back(element.second);
+    }
+    return retval;
+}
+
+template<typename TK, typename TV>
+std::map<TK, TV> sfg::utils::maps::zip(std::vector<TK> const& keys, std::vector<TV> const& values)
+{
+    if (keys.size() != values.size())
+        throw std::runtime_error("Cannot zip different keys and values sizes : shape (" +
+            std::to_string(keys.size()) + ") incompatible with shape (" +
+            std::to_string(values.size()) + ")");
+
+    std::map<TK, TV> resultMap;
+    
+    for (int i = 0; i < keys.size(); i++)
+    {
+        resultMap.try_emplace(keys[i], values[i]);
+    }
+
+    return resultMap;
+}
+
+template<typename TK, typename TV>
+std::pair<std::vector<TK>, std::vector<TV>> sfg::utils::maps::unzip(std::map<TK, TV> const& inputMap)
+{
+    return std::make_pair(extractKeys(inputMap), extractValues(inputMap));
 }
